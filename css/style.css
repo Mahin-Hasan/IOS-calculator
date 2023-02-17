@@ -44,6 +44,10 @@
     font-size: 28px;
  
 }
+.button-shape:active{
+    background-color: rgb(116, 116, 116);
+    transition: 0.3s;
+}
 .button-orange{
     background-color: #fea500;
 }
