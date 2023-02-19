@@ -9,7 +9,6 @@ const equals = document.querySelector('.equals')
 
 
 // declaring initial state
-let firstString = '';
 let firstValue = '';
 let isFirstValue = false;
 let secondValue = '';
@@ -17,26 +16,132 @@ let isSecondValue = false;
 let sign = '';
 let resultValue = 0;
 let lastResultValue = '';
-// let input ='';
+let valueHasDot = false;
 let firstValueHaveDot = false;
 let secondValueHaveDot = false;
+
+// let startsWithZero= false;
 
 // adding click event listeners to all the number button
 for (let i = 0; i < numbers.length; i++) {
     numbers[i].addEventListener('click', (element) => {
         let num = element.target.getAttribute('value')
+        console.log(num);
         // console.log({
         //     num,
         //     isFirstValue,
         //     isSecondValue
         // });
         if (isFirstValue === false || (lastResultValue != "" && isFirstValue == true)) {
-            getFirstValue(num);
+
+            if (lastResultValue != "" && isFirstValue === false) {
+                lastResultValue = "";
+                // clearing last value when first value is taken again
+            }
+
+            firstValue = getInput(num, firstValue);
+            result.value = firstValue;
+            resultId.value = firstValue;
         } else if (isSecondValue === false) {
-            getSecondValue(num);
+            secondValue = getInput(num, secondValue);
+            result.value = secondValue;
+            resultId.value = secondValue;
         }
     })
 }
+
+function getInput(input, value) {
+    // now allowing multiple.
+    // const valueHasDot = value.includes(".");
+
+    if (input === '.' && !valueHasDot) {
+        valueHasDot = true;
+    } else if (input === '.' && valueHasDot) {
+        return value;
+    }
+
+    // validation multiple zero.
+    if (input === '0' && value == "0") {
+        return value;
+    }
+    if (input !== '0' && value == "0") {
+        value = "";
+    }
+
+    value += input;
+
+    //new code for adding 0 when . is clicked
+    if (value.startsWith('.')) {
+        value = "0.";
+    }
+
+    console.log({ type: typeof (value), input, value });
+
+    return value;
+}
+
+function getNumbers(value) {
+    if (lastResultValue != "" && isFirstValue === false) {
+        lastResultValue = "";
+        // clearing last value when first value is taken again
+    }
+    // now allowing multiple .
+    if (value === '.' && !firstValueHaveDot) {
+        firstValueHaveDot = true;
+    } else if (value === '.' && firstValueHaveDot) {
+        return;
+    }
+    // validation multiple zero
+    if (value === '0' && firstValue == "0") {
+        return;
+    }
+    if (value !== '0' && firstValue == "0") {
+        firstValue = "";
+    }
+
+
+    if (secondValue === '' && sign === '') {
+        firstValue += value;
+        //new code for adding 0 when . is clicked
+        if (firstValue.startsWith('.')) {
+            let addZero = '0';
+            let numWithZero = addZero + firstValue;
+            console.log(numWithZero);
+            firstValue = numWithZero;
+        }
+        console.log({ t: typeof (firstValue), firstValue, value });
+        result.value = firstValue;
+        resultId.value = firstValue;
+        console.log('first value', firstValue);
+    }
+    // for 2nd value
+    if (firstValue != '' && sign != '') {
+        if (secondValue != '') {
+            resultId.value = '';
+            // clearing if second value exist
+        }
+        // validation multiple zero
+        if (value === '0' && secondValue == "0") {
+            return;
+        }
+        if (value !== '0' && secondValue == "0") {
+            firstValue = "";
+        }
+        secondValue += value;
+        //new code for adding 0 when . is clicked
+        if (secondValue.startsWith('.')) {
+            let addZeroSecond = '0';
+            let numWithZeroSecond = addZeroSecond + secondValue;
+            console.log(numWithZeroSecond);
+            secondValue = numWithZeroSecond;
+        }
+        result.value = secondValue;
+        // secondValue = +secondValue;
+        resultId.value = secondValue;
+        console.log('second value', secondValue);
+    }
+}
+
 function getFirstValue(firstV) {
     if (lastResultValue != "" && isFirstValue === false) {
         lastResultValue = "";
@@ -48,9 +153,20 @@ function getFirstValue(firstV) {
     } else if (firstV === '.' && firstValueHaveDot) {
         return;
     }
-   
+    // validation multiple zero
+    if (firstV === '0' && firstValue == "0") {
+        return;
+    }
+    if (firstV !== '0' && firstValue == "0") {
+        firstValue = "";
+    }
+
 
     firstValue += firstV;
+
+    // if (firstValue.startsWith('0')) {
+    //     return;
+    // }
     //new code for adding 0 when . is clicked
     if (firstValue.startsWith('.')) {
         let addZero = '0';
@@ -75,11 +191,18 @@ function getSecondValue(secondV) {
         return;
     }
 
-
     if (firstValue != '' && sign != '') {
         if (secondValue != '') {
             resultId.value = '';
             // clearing if second value exist
+        }
+        // validation multiple zero
+        if (secondV === '0' && secondValue == "0") {
+            return;
+        }
+
+        if (secondV !== '0' && secondValue == "0") {
+            firstValue = "";
         }
 
         secondValue += secondV;
@@ -96,7 +219,6 @@ function getSecondValue(secondV) {
         console.log('second value', secondValue);
     }
 }
-
 function getSign() {
     for (let i = 0; i < signs.length; i++) {
         signs[i].addEventListener('click', (element) => {
@@ -105,12 +227,13 @@ function getSign() {
             isFirstValue = true;
         })
     }
-
 }
 
 getSign();
 
 equals.addEventListener('click', () => {
+    valueHasDot = false; // for dot validation
+
     firstValueHaveDot = false; // for dot validation
     secondValueHaveDot = false; // for dot validation
     // converting 
@@ -145,7 +268,11 @@ equals.addEventListener('click', () => {
     isFirstValue = false;
     secondValue = '';
     isSecondValue = false;
-    sign = ''
+    sign = '';
+    valueHasDot = false;
+    firstValueHaveDot = false;
+    secondValueHaveDot = false;
+
 })
 
 // AC Button.
@@ -159,6 +286,9 @@ clear.addEventListener('click', () => {
     isSecondValue = false;
     sign = '';
     resultValue = 0;
+    valueHasDot = false;
+    firstValueHaveDot = false;
+    secondValueHaveDot = false;
 })
 
 
